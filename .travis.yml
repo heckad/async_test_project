@@ -1,0 +1,18 @@
+dist: xenial
+language: python
+
+python: 3.7
+
+env:
+  - MONGO_HOST=localhost MONGO_USERNAME=root MONGO_PASSWORD=1234
+
+services:
+  - mongodb
+
+install:
+  - pip install -r requirements_test.txt
+
+before_script:
+  - mongo admin --eval 'db.createUser({user:"root", pwd:"1234", roles:["readWrite"]});'
+
+script: python -m pytest

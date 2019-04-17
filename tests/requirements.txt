@@ -1,0 +1,4 @@
+asyncio
+motor
+pytest
+pytest-aiohttp

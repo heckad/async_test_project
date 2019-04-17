@@ -1,0 +1,4 @@
+-r docker_build/requirements.txt
+pytest
+pytest-aiohttp
+pytest-mock

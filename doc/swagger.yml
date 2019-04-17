@@ -1,0 +1,256 @@
+openapi: 3.0.0
+info:
+  title: "Swagger devhub"
+  description: "This is the api of devhab servise."
+  version: "0.1.0"
+
+paths:
+  /:
+    get:
+      tags:
+        - "info"
+      summary: "Return servise info"
+      responses:
+        "200":
+          description: "successful operation"
+          content:
+            application/json:
+              schema:
+                type: object
+                properties:
+                  status:
+                    type: string
+                    default: success
+                  version:
+                    type: string
+  /element:
+    get:
+      tags:
+        - "elements"
+      summary: "Return elements"
+      description: ""
+      parameters:
+        - name: query
+          in: query
+          description: Full text search string
+          required: false
+          schema:
+            type: string
+        - $ref: '#/components/parameters/limitParam'
+        - $ref: '#/components/parameters/offsetParam'
+      responses:
+        "200":
+          description: "successful operation"
+          content:
+            application/json:
+              schema:
+                type: object
+                properties:
+                  status:
+                    type: string
+                    default: success
+                  items:
+                    $ref: "#/components/schemas/Element"
+        "400":
+          $ref: '#/components/responses/SomeError'
+        "401":
+          $ref: '#/components/responses/UnauthorizedError'
+        "404":
+          description: "Not found"
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/ApiErrorResponse"
+    post:
+      tags:
+        - "elements"
+      summary: "Add new element to db"
+      description: ""
+      requestBody:
+        description: "Element with parrent id"
+        required: true
+        content:
+          application/json:
+            schema:
+              $ref: '#/components/schemas/InputElement'
+      responses:
+        "200":
+          description: "successful operation"
+          content:
+            application/json:
+              schema:
+                type: object
+                properties:
+                  status:
+                    type: string
+                    default: success
+                  items:
+                    $ref: "#/components/schemas/Element"
+        "401":
+          $ref: '#/components/responses/UnauthorizedError'
+        "404":
+          description: "Not found"
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/ApiErrorResponse"
+  /element/{id}:
+    delete:
+      tags:
+        - "elements"
+      summary: "Delete element"
+      description: ""
+      parameters:
+        - in: path
+          name: id
+          required: true
+          description: "Id of Element"
+          schema:
+            type: string
+      responses:
+        "200":
+          description: "successful operation"
+          content:
+            application/json:
+              schema:
+                type: object
+                properties:
+                  status:
+                    type: string
+                    default: success
+                  items:
+                    $ref: "#/components/schemas/Element"
+                  pagination:
+                    type: object
+                    properties:
+                      total:
+                        type: integer
+                      limit:
+                        type: integer
+                      offset:
+                        type: integer
+        "400":
+          $ref: '#/components/responses/SomeError'
+        "401":
+          $ref: '#/components/responses/UnauthorizedError'
+        "404":
+          description: "Not found"
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/ApiErrorResponse"
+  /subtree/{id}:
+    get:
+      tags:
+        - "subtree"
+      summary: "Return elements in subtree"
+      description: ""
+      parameters:
+        - in: path
+          name: id
+          required: true
+          description: "Id of Element"
+          schema:
+            type: string
+      responses:
+        "200":
+          description: "successful operation"
+          content:
+            application/json:
+              schema:
+                type: object
+                properties:
+                  status:
+                    type: string
+                    default: success
+                  items:
+                    type: array
+                    items:
+                      $ref: '#/components/schemas/Element'
+        "400":
+          $ref: '#/components/responses/SomeError'
+        "401":
+          $ref: '#/components/responses/UnauthorizedError'
+        "404":
+          description: "Not found"
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/ApiErrorResponse"
+
+components:
+  schemas:
+    Element:
+      type: object
+      properties:
+        id:
+          type: string
+        text:
+          type: string
+        parents:
+          type: array
+          items:
+            type: string
+    InputElement:
+      type: object
+      properties:
+        id:
+          type: string
+        text:
+          type: string
+        parent_id:
+          type: string
+    ApiErrorResponse:
+      type: object
+      properties:
+        status:
+          type: string
+        message:
+          type: string
+  responses:
+    SomeError:
+      description: "Some error. See message"
+      content:
+        application/json:
+          schema:
+            $ref: "#/components/schemas/ApiErrorResponse"
+    UnauthorizedError:
+      description: "Access token is missing or invalid"
+      content:
+        application/json:
+          schema:
+            $ref: "#/components/schemas/ApiErrorResponse"
+    NotFound:
+      description: "Not found"
+      content:
+        application/json:
+          schema:
+            $ref: "#/components/schemas/ApiErrorResponse"
+  parameters:
+    offsetParam:
+      name: offset
+      in: query
+      description: Number of items to skip before returning the results.
+      required: false
+      schema:
+        type: integer
+        format: int32
+        minimum: 0
+        default: 0
+    limitParam:
+      name: limit
+      in: query
+      description: Maximum number of items to return.
+      required: false
+      schema:
+        type: integer
+        format: int32
+        minimum: 0
+        maximum: 100
+        default: 32
+  securitySchemes:
+    basicAuth:
+      type: http
+      scheme: basic
+security:
+  - basicAuth: []
