@@ -1,4 +1,4 @@
-# async_test_project [![Build Status](https://travis-ci.com/heckad/async_test_project.svg?token=sayMjzmTTwJmyWhhtYiY&branch=master)](https://travis-ci.com/heckad/async_test_project)
+# async_test_project [![Build Status](https://travis-ci.org/heckad/async_test_project.svg?branch=master)](https://travis-ci.com/heckad/async_test_project)
 
 ## Installing
   * Install mongodb
