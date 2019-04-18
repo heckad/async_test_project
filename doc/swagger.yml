@@ -187,7 +187,7 @@ components:
           type: string
         text:
           type: string
-        parents:
+        ancestors:
           type: array
           items:
             type: string
