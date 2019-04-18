@@ -2,7 +2,7 @@ from aiohttp import web
 from pymongo.errors import DuplicateKeyError
 
 from async_test_project.decorators import async_login_require, with_limit_and_offset
-from async_test_project.util import error_response, get_parents_for_item
+from async_test_project.util import error_response
 
 routes = web.RouteTableDef()
 
@@ -26,9 +26,6 @@ async def get_element(request: web.Request, db, limit, offset, **kwargs):
 
     items = await query.limit(limit).skip(offset).to_list(length=limit)
 
-    for item in items:
-        item["parents"] = await get_parents_for_item(item, db)
-
     return web.json_response({
         "status": "success",
         "items": items,
@@ -44,10 +41,9 @@ async def add_element(request: web.Request, db, **kwargs):
         return error_response("Id not specify")
     if not isinstance(element["_id"], str):
         return error_response("Id should be a string")
-    if "__children__" in element:
-        return error_response("Field '__children__' isn't allow")
+    if "ancestors" in element:
+        return error_response("Field 'ancestors' isn't allow")
 
-    id = element['_id']
     parent_id = element.get("parent_id")
     if parent_id is not None:
         parent = await db.find_one({"_id": parent_id})
@@ -55,18 +51,15 @@ async def add_element(request: web.Request, db, **kwargs):
         if parent is None:
             return error_response(f"Target for parent with id={parent_id} didn't find.")
         else:
-            try:
-                parent['__children__'].append(id)
-            except KeyError:
-                parent['__children__'] = [id]
-        await db.update_one({"_id": parent["_id"]}, {"$set": parent}, upsert=False)
+            ancestors = parent["ancestors"]
+            ancestors.append(parent_id)
+            element["ancestors"] = ancestors
 
     try:
         await db.insert_one(element)
     except DuplicateKeyError as e:
         return error_response("Object with such id already exists")
 
-    element["id"] = str(element.pop("_id"))
     return web.json_response(element)
 
 
@@ -76,29 +69,7 @@ async def add_element(request: web.Request, db, **kwargs):
 async def get_subtree(request: web.Request, db, limit, offset, **kwargs):
     id = request.match_info["id"]
 
-    target = await db.find_one({"_id": id})
-    if target is None:
-        return error_response("Not found", 404)
-
-    children_ids = target.get("__children__", [])
-
-    items = []
-    while children_ids and limit > 0:
-        child_id = children_ids.pop()
-        child = await db.find_one({"_id": child_id})
-
-        child["id"] = str(child.pop("_id"))
-        child["parents"] = await get_parents_for_item(child, db)
-
-        children_ids.extend(child.get("__children__", []))
-
-        if offset > 0:
-            offset -= 1
-            continue
-
-        limit -= 1
-        child.pop("__children__", None)
-        items.append(child)
+    items = await db.find({"ancestors": id}).limit(limit).skip(offset).to_list(length=limit)
 
     return web.json_response({
         "status": "success",

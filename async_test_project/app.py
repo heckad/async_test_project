@@ -21,6 +21,7 @@ def create_app():
         }
 
         app['db_clients']["root"].test.collections.create_index([("text", pymongo.TEXT)])
+        app['db_clients']["root"].test.collections.create_index([("ancestors", 1)])
 
     app.on_startup.append(init_db_clients)
 

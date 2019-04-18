@@ -39,17 +39,18 @@ async def test_get_elements_in_node(client, prepare_data):
     assert resp.status == 200, await resp.text()
 
     items = (await resp.json())["items"]
-    assert {'text': 'hello2', 'id': '2', 'parents': ['1']} in items
-    assert {'text': 'hello3', 'id': '3', 'parents': ['2', '1']} in items
-    assert {'text': 'hello4', 'id': '4', 'parents': ['3', '2', '1']} in items
-    assert {'text': 'hello5', 'id': '5', 'parents': ['4', '3', '2', '1']} in items
-    assert {'text': 'hello6', 'id': '6', 'parents': ['3', '2', '1']} in items
-    assert {'text': 'hello7', 'id': '7', 'parents': ['3', '2', '1']} in items
+    assert {"_id": "2", "text": "hello2", "parent_id": "1", "ancestors": ["1"]} in items
+    assert {"_id": "3", "text": "hello3", "parent_id": "2", "ancestors": ["1", "2"]} in items
+    assert {"_id": "4", "text": "hello4", "parent_id": "3", "ancestors": ["1", "2", "3"]} in items
+    assert {"_id": "5", "text": "hello5", "parent_id": "4", "ancestors": ["1", "2", "3", "4"]} in items
+    assert {"_id": "6", "text": "hello6", "parent_id": "3", "ancestors": ["1", "2", "3"]}in items
+    assert {"_id": "7", "text": "hello7", "parent_id": "3", "ancestors": ["1", "2", "3"]}in items
 
 
 async def test_get_elements_in_not_existing_node(client, prepare_data):
     resp = await client.get("/subtree/{}".format(100))
-    assert resp.status == 404, await resp.text()
+    assert resp.status == 200, await resp.text()
+    assert len((await resp.json())["items"]) == 0
 
 
 async def test_get_elements_in_node_with_offset(client, prepare_data):

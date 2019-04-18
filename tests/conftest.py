@@ -9,13 +9,13 @@ from cryptography.fernet import Fernet
 @pytest.fixture(scope="session")
 def example_data():
     return [
-        {"_id": "1", "text": "hello", "__children__": ["2"]},
-        {"_id": "2", "text": "hello2", "parent_id": "1", "__children__": ["3"]},
-        {"_id": "3", "text": "hello3", "parent_id": "2", "__children__": ["4", "6", "7"]},
-        {"_id": "4", "text": "hello4", "parent_id": "3", "__children__": ["5"]},
-        {"_id": "5", "text": "hello5", "parent_id": "4"},
-        {"_id": "6", "text": "hello6", "parent_id": "3"},
-        {"_id": "7", "text": "hello7", "parent_id": "3"},
+        {"_id": "1", "text": "hello", "ancestors": []},
+        {"_id": "2", "text": "hello2", "parent_id": "1", "ancestors": ["1"]},
+        {"_id": "3", "text": "hello3", "parent_id": "2", "ancestors": ["1", "2"]},
+        {"_id": "4", "text": "hello4", "parent_id": "3", "ancestors": ["1", "2", "3"]},
+        {"_id": "5", "text": "hello5", "parent_id": "4", "ancestors": ["1", "2", "3", "4"]},
+        {"_id": "6", "text": "hello6", "parent_id": "3", "ancestors": ["1", "2", "3"]},
+        {"_id": "7", "text": "hello7", "parent_id": "3", "ancestors": ["1", "2", "3"]},
     ]
 
 

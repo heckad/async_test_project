@@ -36,12 +36,3 @@ def get_limit_and_offset(request):
         return error_response("{} must be a int".format(e.var_name))
     return limit, offset
 
-
-async def get_parents_for_item(item, db):
-    parent_ids = []
-    parent_id = item.pop('parent_id', None)
-    while parent_id is not None:
-        el = await db.find_one({"_id": parent_id})
-        parent_ids.append(el["_id"])
-        parent_id = el.get("parent_id")
-    return parent_ids

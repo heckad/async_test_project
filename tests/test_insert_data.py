@@ -43,7 +43,7 @@ async def test_insert_data_with_int_id(client, prepare_data):
 
 
 async def test_insert_data_with___children___field(client, prepare_data):
-    el = {"_id": "10", "text": "hello", "parent_id": "2", "__children__": ["32", "3"]}
+    el = {"_id": "10", "text": "hello", "parent_id": "2", "ancestors": ["32", "3"]}
     resp = await client.post("/element", json=el)
     assert resp.status == 400
-    assert "Field '__children__' isn't allow" == (await resp.json())["message"]
+    assert "Field 'ancestors' isn't allow" == (await resp.json())["message"]
