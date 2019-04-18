@@ -82,9 +82,14 @@ async def get_subtree(request: web.Request, db, limit, offset, **kwargs):
 async def delete_element(request: web.Request, db, **kwargs):
     id = request.match_info["id"]
 
-    element = await db.find_one({"_id": id})
-    if element is not None:
-        await db.delete_one({"_id": id})
-        return web.json_response(element)
-    else:
-        return error_response("Not found", 404)
+    result = await db.delete_many({"$or": [{"_id": id}, {"list.id": id}]})
+
+    return web.json_response({
+        "deleted_count": result.deleted_count
+    })
+    # element = await db.find_one({"_id": id})
+    # if element is not None:
+    #     await db.delete_one({"_id": id})
+    #     return web.json_response(element)
+    # else:
+    #     return error_response("Not found", 404)

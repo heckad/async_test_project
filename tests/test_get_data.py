@@ -31,7 +31,8 @@ async def test_get_elements_with_query(client, prepare_data):
 
 async def test_remove_not_existing_element(client, prepare_data):
     resp = await client.delete("/element/{}".format(max(prepare_data)) + "1")
-    assert resp.status == 404, await resp.text()
+    assert resp.status == 200, await resp.text()
+    assert (await resp.json())["deleted_count"] == 0
 
 
 async def test_get_elements_in_node(client, prepare_data):
@@ -43,8 +44,8 @@ async def test_get_elements_in_node(client, prepare_data):
     assert {"_id": "3", "text": "hello3", "parent_id": "2", "ancestors": ["1", "2"]} in items
     assert {"_id": "4", "text": "hello4", "parent_id": "3", "ancestors": ["1", "2", "3"]} in items
     assert {"_id": "5", "text": "hello5", "parent_id": "4", "ancestors": ["1", "2", "3", "4"]} in items
-    assert {"_id": "6", "text": "hello6", "parent_id": "3", "ancestors": ["1", "2", "3"]}in items
-    assert {"_id": "7", "text": "hello7", "parent_id": "3", "ancestors": ["1", "2", "3"]}in items
+    assert {"_id": "6", "text": "hello6", "parent_id": "3", "ancestors": ["1", "2", "3"]} in items
+    assert {"_id": "7", "text": "hello7", "parent_id": "3", "ancestors": ["1", "2", "3"]} in items
 
 
 async def test_get_elements_in_not_existing_node(client, prepare_data):

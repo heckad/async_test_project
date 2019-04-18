@@ -115,20 +115,9 @@ paths:
               schema:
                 type: object
                 properties:
-                  status:
-                    type: string
-                    default: success
-                  items:
-                    $ref: "#/components/schemas/Element"
-                  pagination:
-                    type: object
-                    properties:
-                      total:
-                        type: integer
-                      limit:
-                        type: integer
-                      offset:
-                        type: integer
+                  deleted_count:
+                    type: integer
+
         "400":
           $ref: '#/components/responses/SomeError'
         "401":
