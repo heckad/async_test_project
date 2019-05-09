@@ -72,7 +72,7 @@ paths:
         content:
           application/json:
             schema:
-              $ref: '#/components/schemas/InputElement'
+              $ref: '#/components/schemas/NewElement'
       responses:
         "200":
           description: "successful operation"
@@ -180,7 +180,7 @@ components:
           type: array
           items:
             type: string
-    InputElement:
+    NewElement:
       type: object
       properties:
         id:
